@@ -13,6 +13,7 @@ import { MatToolbarModule } from "@angular/material/toolbar";
 import { HeaderComponent } from "./header/header.component";
 import { PostListComponent } from "./posts/post-list/post-list.component";
 import { PostsService } from "./posts/posts.service";
+import { HttpClientModule } from "@angular/common/http";
 
 @NgModule({
   declarations: [AppComponent, PostCreateComponent, HeaderComponent, PostListComponent],
@@ -24,7 +25,8 @@ import { PostsService } from "./posts/posts.service";
     MatButtonModule,
     MatCardModule,
     MatToolbarModule,
-    MatExpansionModule
+    MatExpansionModule,
+    HttpClientModule
   ],
   providers: [PostsService],
   bootstrap: [AppComponent],

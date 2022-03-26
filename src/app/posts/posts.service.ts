@@ -1,21 +1,21 @@
-import { Post } from "./post.model";
-import { map, Subject } from "rxjs";
-import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { Subject } from "rxjs";
+import { map } from "rxjs/operators";
 import { Router } from "@angular/router";
 
-@Injectable({
-  providedIn: "root",
-})
+import { Post } from "./post.model";
+
+@Injectable({ providedIn: "root" })
 export class PostsService {
   private posts: Post[] = [];
   private postsUpdated = new Subject<{ posts: Post[]; postCount: number }>();
 
-  constructor(private httpClient: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient, private router: Router) {}
 
   getPosts(postsPerPage: number, currentPage: number) {
     const queryParams = `?pagesize=${postsPerPage}&page=${currentPage}`;
-    this.httpClient
+    this.http
       .get<{ message: string; posts: any; maxPosts: number }>(
         "http://localhost:3000/api/posts" + queryParams
       )
@@ -28,7 +28,7 @@ export class PostsService {
                 content: post.content,
                 id: post._id,
                 imagePath: post.imagePath,
-                creator: post.userId,
+                creator: post.creator,
               };
             }),
             maxPosts: postData.maxPosts,
@@ -49,7 +49,7 @@ export class PostsService {
   }
 
   getPost(id: string) {
-    return this.httpClient.get<{
+    return this.http.get<{
       _id: string;
       title: string;
       content: string;
@@ -63,7 +63,7 @@ export class PostsService {
     postData.append("title", title);
     postData.append("content", content);
     postData.append("image", image, title);
-    this.httpClient
+    this.http
       .post<{ message: string; post: Post }>(
         "http://localhost:3000/api/posts",
         postData
@@ -90,7 +90,7 @@ export class PostsService {
         creator: null,
       };
     }
-    this.httpClient
+    this.http
       .put("http://localhost:3000/api/posts/" + id, postData)
       .subscribe((response) => {
         this.router.navigate(["/"]);
@@ -98,6 +98,6 @@ export class PostsService {
   }
 
   deletePost(postId: string) {
-    return this.httpClient.delete("http://localhost:3000/api/posts/" + postId);
+    return this.http.delete("http://localhost:3000/api/posts/" + postId);
   }
 }

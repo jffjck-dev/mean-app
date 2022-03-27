@@ -1,12 +1,12 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
-import { FormControl, FormGroup, Validators } from "@angular/forms";
+import { Component, OnInit, OnDestroy } from "@angular/core";
+import { FormGroup, FormControl, Validators } from "@angular/forms";
 import { ActivatedRoute, ParamMap } from "@angular/router";
+import { Subscription } from "rxjs";
 
 import { PostsService } from "../posts.service";
 import { Post } from "../post.model";
 import { mimeType } from "./mime-type.validator";
-import { Subscription } from "rxjs";
-import { AuthService } from "src/app/auth/auth.service";
+import { AuthService } from "../../auth/auth.service";
 
 @Component({
   selector: "app-post-create",
@@ -88,7 +88,6 @@ export class PostCreateComponent implements OnInit, OnDestroy {
     if (this.form.invalid) {
       return;
     }
-
     this.isLoading = true;
     if (this.mode === "create") {
       this.postsService.addPost(

@@ -1,12 +1,14 @@
-import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
 import { Router } from "@angular/router";
 import { Subject } from "rxjs";
-import { AuthData } from "./auth-data.model";
 
-@Injectable({
-  providedIn: "root",
-})
+import { AuthData } from "./auth-data.model";
+import { environment } from "src/environments/environment";
+
+const BACKEND_URL = environment.apiUrl + "/auth/";
+
+@Injectable({ providedIn: "root" })
 export class AuthService {
   private isAuthenticated = false;
   private token: string;
@@ -34,23 +36,21 @@ export class AuthService {
 
   createUser(email: string, password: string) {
     const authData: AuthData = { email: email, password: password };
-    return this.http
-      .post("http://localhost:3000/api/auth/signup", authData)
-      .subscribe(
-        () => {
-          this.router.navigate(["/login"]);
-        },
-        (error) => {
-          this.authStatusListener.next(false);
-        }
-      );
+    this.http.post(BACKEND_URL + "signup", authData).subscribe(
+      () => {
+        this.router.navigate(["/login"]);
+      },
+      (error) => {
+        this.authStatusListener.next(false);
+      }
+    );
   }
 
   login(email: string, password: string) {
     const authData: AuthData = { email: email, password: password };
     this.http
       .post<{ token: string; expiresIn: number; userId: string }>(
-        "http://localhost:3000/api/auth/login",
+        BACKEND_URL + "login",
         authData
       )
       .subscribe(
@@ -67,6 +67,7 @@ export class AuthService {
             const expirationDate = new Date(
               now.getTime() + expiresInDuration * 1000
             );
+            console.log(expirationDate);
             this.saveAuthData(token, expirationDate, this.userId);
             this.router.navigate(["/"]);
           }
@@ -100,10 +101,11 @@ export class AuthService {
     this.userId = null;
     clearTimeout(this.tokenTimer);
     this.clearAuthData();
-    this.router.navigate(["/login"]);
+    this.router.navigate(["/"]);
   }
 
   private setAuthTimer(duration: number) {
+    console.log("Setting timer: " + duration);
     this.tokenTimer = window.setTimeout(() => {
       this.logout();
     }, duration * 1000);
